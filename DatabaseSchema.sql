@@ -18,20 +18,21 @@ USE `school`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `advisor_departments`
+-- Table structure for table `advisors`
 --
 
-DROP TABLE IF EXISTS `advisor_departments`;
+DROP TABLE IF EXISTS `advisors`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `advisor_departments` (
-  `advisor_id` int NOT NULL,
-  `department_id` int NOT NULL,
-  PRIMARY KEY (`advisor_id`,`department_id`),
-  KEY `department_id` (`department_id`),
-  CONSTRAINT `advisor_departments_ibfk_1` FOREIGN KEY (`advisor_id`) REFERENCES `advisors` (`advisor_id`),
-  CONSTRAINT `advisor_departments_ibfk_2` FOREIGN KEY (`department_id`) REFERENCES `departments` (`department_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE `advisors` (
+  `advisor_id` int NOT NULL AUTO_INCREMENT,
+  `first_name` varchar(50) DEFAULT NULL,
+  `last_name` varchar(50) DEFAULT NULL,
+  `department_id` int DEFAULT NULL,
+  PRIMARY KEY (`advisor_id`),
+  KEY `fk_department` (`department_id`),
+  CONSTRAINT `fk_department` FOREIGN KEY (`department_id`) REFERENCES `departments` (`department_id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -42,9 +43,9 @@ CREATE TABLE `advisor_departments` (
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `after_advisor_departments__insert` AFTER INSERT ON `advisor_departments` FOR EACH ROW BEGIN
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `after_advisors_insert` AFTER INSERT ON `advisors` FOR EACH ROW BEGIN
     INSERT INTO LOGS (username, action_performed, data_affected)
-    VALUES (USER(), 'INSERT', CONCAT('New Data: ', NEW.advisor_id, ', ', NEW.department_id));
+    VALUES (USER(), 'INSERT', CONCAT('New Data: ', NEW.advisor_id, ', ', NEW.first_name, ',', NEW.last_name, ',', NEW.department_id));
 END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -60,12 +61,18 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `after_advisor_departments_update` AFTER UPDATE ON `advisor_departments` FOR EACH ROW BEGIN
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `after_advisors_update` AFTER UPDATE ON `advisors` FOR EACH ROW BEGIN
     DECLARE changes TEXT;
     SET changes = '';
 
     IF OLD.advisor_id != NEW.advisor_id THEN
         SET changes = CONCAT(changes, 'column1: ', OLD.advisor_id, ' -> ', NEW.advisor_id, '; ');
+    END IF;
+    IF OLD.first_name != NEW.first_name THEN
+        SET changes = CONCAT(changes, 'column2: ', OLD.first_name, ' -> ', NEW.first_name, '; ');
+    END IF;
+    IF OLD.last_name != NEW.last_name THEN
+        SET changes = CONCAT(changes, 'column2: ', OLD.last_name, ' -> ', NEW.last_name, '; ');
     END IF;
     IF OLD.department_id != NEW.department_id THEN
         SET changes = CONCAT(changes, 'column2: ', OLD.department_id, ' -> ', NEW.department_id, '; ');
@@ -91,94 +98,9 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `after_advisor_departments_delete` AFTER DELETE ON `advisor_departments` FOR EACH ROW BEGIN
-    INSERT INTO LOGS (username, action_performed, data_affected)
-    VALUES (USER(), 'DELETE', CONCAT('Deleted Data: ', OLD.advisor_id, ', ', OLD.department_id));
-END */;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
-
---
--- Table structure for table `advisors`
---
-
-DROP TABLE IF EXISTS `advisors`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `advisors` (
-  `advisor_id` int NOT NULL AUTO_INCREMENT,
-  `first_name` varchar(50) DEFAULT NULL,
-  `last_name` varchar(50) DEFAULT NULL,
-  PRIMARY KEY (`advisor_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `after_advisors_insert` AFTER INSERT ON `advisors` FOR EACH ROW BEGIN
-    INSERT INTO LOGS (username, action_performed, data_affected)
-    VALUES (USER(), 'INSERT', CONCAT('New Data: ', NEW.advisor_id, ', ', NEW.first_name, ', ', New.last_name));
-END */;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `after_advisors_update` AFTER UPDATE ON `advisors` FOR EACH ROW BEGIN
-    DECLARE changes TEXT;
-    SET changes = '';
-
-    IF OLD.first_name != NEW.first_name THEN
-        SET changes = CONCAT(changes, 'column1: ', OLD.first_name, ' -> ', NEW.first_name, '; ');
-    END IF;
-    IF OLD.last_name != NEW.last_name THEN
-        SET changes = CONCAT(changes, 'column2: ', OLD.last_name, ' -> ', NEW.last_name, '; ');
-    END IF;
-	IF OLD.advisor_id != NEW.advisor_id THEN
-        SET changes = CONCAT(changes, 'column2: ', OLD.advisor_id, ' -> ', NEW.advisor_id, '; ');
-    END IF;
-    -- Repeat for other columns as needed
-
-    IF changes != '' THEN
-        INSERT INTO LOGS (username, action_performed, data_affected)
-        VALUES (USER(), 'UPDATE', changes);
-    END IF;
-END */;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `after_advisors_delete` AFTER DELETE ON `advisors` FOR EACH ROW BEGIN
     INSERT INTO LOGS (username, action_performed, data_affected)
-    VALUES (USER(), 'DELETE', CONCAT('Deleted Data: ', OLD.advisor_id, ', ', OLD.first_name, ', ',OLD.last_name));
+    VALUES (USER(), 'DELETE', CONCAT('Deleted Data: ', OLD.advisor_id, ', ', OLD.first_name, ',', OLD.last_name, ',', OLD.department_id));
 END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -1157,10 +1079,6 @@ DELIMITER ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
--- Dumping events for database 'school'
---
-
---
 -- Dumping routines for database 'school'
 --
 /*!50003 DROP PROCEDURE IF EXISTS `DropCourse` */;
@@ -1494,4 +1412,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-19 21:08:24
+-- Dump completed on 2024-11-19 21:43:51
